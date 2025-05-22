@@ -1,5 +1,5 @@
 CC          = g++
-EXEC        = run
+EXEC        = OpenNu
 BUILD_DIR   = build
 
 INCL        = -I./include

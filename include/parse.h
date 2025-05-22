@@ -52,7 +52,6 @@ typedef struct
     int mtime;
 
     double hthr;
-    double sthr;
     double omega;
     double beta;
     double theta;
@@ -79,10 +78,9 @@ Params defaults()
     Params pars;
     pars.N     = 100;
     pars.outs  = 50;
-    pars.mtime = 0;
+    pars.mtime = 1;
 
     pars.hthr  = 0.1f;
-    pars.sthr  = 0.01f;
     pars.omega = 1.0f;
     pars.beta  = 1.0f;
     pars.theta = 3.14/2.0;
@@ -152,7 +150,6 @@ void printHelp()
     std::cout << "                                                              1: Log (default)"              << std::endl; 
     std::cout << "                                                                   "                         << std::endl; 
     std::cout << "Timestep threshold         --thr            <dbl>    (Default: 0.5)"                         << std::endl; 
-    std::cout << "Slope threshold            --sthr           <dbl>    (Default: 0.01)"                        << std::endl; 
     std::cout << "                                                                   "                         << std::endl; 
     std::cout << "Omega (energy unit)        --omega          <dbl>    (Default: 1.0)"                         << std::endl; 
     std::cout << "Inverse Temp (omega^-1)    --beta           <dbl>    (Default: 1.0)"                         << std::endl; 
@@ -171,7 +168,6 @@ int parseArgs(int argc, char* argv[], Params* pars)
         else if (!strcmp(argv[i], "--meas") && i+1 < argc)    { pars->outs    = atoi(argv[++i]); }
         else if (!strcmp(argv[i], "--mtime") && i+1 < argc)   { pars->mtime   = atoi(argv[++i]); }
         else if (!strcmp(argv[i], "--thr") && i+1 < argc)     { pars->hthr    = atof(argv[++i]); }
-        else if (!strcmp(argv[i], "--sthr") && i+1 < argc)    { pars->sthr    = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--h") && i+1 < argc)       { pars->h       = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--ti") && i+1 < argc)      { pars->t_i     = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--tf") && i+1 < argc)      { pars->t_f     = atof(argv[++i]); }
@@ -308,7 +304,7 @@ void printParams(Params* pars)
 }
 
 void printBanner() {
-    std::cout << "\033[1;36m";  // Light green
+    std::cout << "\033[1;36m"; 
     std::cout << R"(
  _____                  _   _       
 |  _  |                | \ | |      

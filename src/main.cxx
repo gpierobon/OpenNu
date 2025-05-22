@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
     std::cout << "\nTime step set to: dt = " << h_check << std::endl;
     std::cout << "Running a loop with " << num_steps << " steps ... \n" << std::endl;
 
-    std::vector<size_t> bins = generateMeasList(&pars, dt, num_steps);
+    std::vector<size_t> times = generateMeasList(&pars, dt, num_steps);
     double t0 = pars.t_i;
     int meas_count = 0;
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 
         evolve(pars.integrator, vstate, L, dt, t);
                                                             
-        if (std::binary_search(bins.begin(), bins.end(), i))
+        if (std::binary_search(times.begin(), times.end(), i))
         {
             meas_count += 1;
             Clock::time_point curr = Clock::now();

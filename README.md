@@ -17,10 +17,10 @@ make
 
 A run with default values simply by calling:
 ```bash
-./run
+./OpenNu
 ```
 The available paramters can be found by running:
 ```bash
-./run --info
+./OpenNu --info
 ```
 
