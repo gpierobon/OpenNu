@@ -1,0 +1,10 @@
+
+run
+output/
+build/
+plots/
+
+massif.out.*
+
+.ipynb_checkpoints/
+__pycache__/
