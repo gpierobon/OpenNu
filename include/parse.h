@@ -228,7 +228,7 @@ std::string setDir(std::string base, int N, std::string state, std::string inte,
 
     dir1 << base << "/N" << N;
     dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
-         << thr << "_g" << gnet << ".txt";
+         << thr << "_g" << std::fixed << std::setprecision(2) << gnet << ".txt";
     
     std::filesystem::create_directories(dir1.str());
     
