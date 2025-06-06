@@ -221,15 +221,30 @@ int parseArgs(int argc, char* argv[], Params* pars)
     return 0;
 }
 
-std::string setDir(std::string base, int N, std::string state, std::string inte, double thr, double gnet)
+std::string setDir(Params* pars, std::string state, std::string inte)
 {
     std::stringstream dir1;
     std::stringstream dir2;
 
-    dir1 << base << "/N" << N;
-    dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
-         << thr << "_g" << std::fixed << std::setprecision(2) << gnet << ".txt";
-    
+    std::string base = pars->outf;
+    int N = pars->N;
+    double thr = pars->hthr;
+    double gamma = pars->gamma;
+    double beta = pars->beta;
+
+    if (state == "Thermal")
+    {
+        dir1 << base << "/N" << N;
+        dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
+             << thr << "_g" << std::fixed << std::setprecision(2) << gamma << "_beta" << beta << ".txt";
+    } 
+    else
+    {
+        dir1 << base << "/N" << N;
+        dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
+             << thr << "_g" << std::fixed << std::setprecision(2) << gamma << ".txt";
+    }
+
     std::filesystem::create_directories(dir1.str());
     
     return dir2.str();
@@ -267,8 +282,7 @@ void printParams(Params* pars)
     else
         int_name = "RK4";
 
-    std::string filename = setDir(pars->outf, pars->N, st_name, int_name, 
-                                  pars->hthr, pars->gamma); 
+    std::string filename = setDir(pars,st_name, int_name);
 
     if (std::filesystem::exists(filename))
         std::filesystem::remove(filename);
