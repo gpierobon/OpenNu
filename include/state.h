@@ -84,7 +84,7 @@ cMat ProductState(int N)
 cMat CoherentSpinState(int N, double theta, double phi)
 {
     int dim = N + 1;
-    Eigen::VectorXcd coeffs(dim);
+    cVec coeffs(dim);
 
     std::vector<double> log_fact(N + 1, 0.0);
     for (int i = 1; i <= N; ++i)
@@ -115,41 +115,109 @@ cMat CoherentSpinState(int N, double theta, double phi)
     return rho;
 }
 
-
-cMat ThermalState(int N, double beta, double omega_0)
+double computePolarisation(int N, double beta, double omega_0)
 {
+    int dim = N + 1;
+    double S = N / 2.0;
+    double Z = 0.0;
+    double P = 0.0;
+
+    for (int i = 0; i < dim; ++i)
+    {
+        double m = S - i;
+        double E = omega_0 * m;
+        double w = std::exp(-beta * E);
+        Z += w;
+        P += m * w;
+    }
+
+    double pol = std::abs(P/Z/S);
+    return pol;
+}
+
+
+double findBeta(int N, double omega_0, double target_pol,
+                               double tol = 1e-6, int max_iter = 100)
+{
+    if (target_pol >= 1.0) {
+        std::cerr << "Warning: target polarisation = 1 not achievable for finite beta. "
+                     "Returning large beta instead.\n";
+        return 10; 
+    }
+
+    double beta_low = 0.0;
+    double beta_high = 10.0;
+
+    auto f = [&](double beta) {
+        return computePolarisation(N, beta, omega_0) - target_pol;
+    };
+
+    while (f(beta_high) < 0 && beta_high < 10) {
+        beta_high *= 2;
+    }
+
+    double f_low = f(beta_low);
+    double f_high = f(beta_high);
+
+    if (f_low > 0 || f_high < 0)
+    {
+        std::cerr << "Target polarisation is outside achievable range (0 <= p < 1).\n";
+        exit(1);
+    }
+
+    for (int i = 0; i < max_iter; ++i)
+    {
+        double beta_mid = 0.5 * (beta_low + beta_high);
+        double f_mid = f(beta_mid);
+
+        if (std::abs(f_mid) < tol)
+            return beta_mid;
+
+        if (f_mid > 0)
+            beta_high = beta_mid;
+        else
+            beta_low = beta_mid;
+    }
+
+    std::cerr << "Warning: beta not found within tolerance\n";
+    return 0.5 * (beta_low + beta_high);
+}
+
+cMat ThermalState(int N, double pol_target, double omega_0)
+{
+    double beta = findBeta(N, omega_0, pol_target);
+    std::cout << "\n\n[Thermal State] Found beta = " << beta << std::endl;
+
     int dim = N + 1;
     double S = N / 2.0;
     cMat X0 = cMat::Zero(dim, dim);
 
-    std::vector<double> boltzmann_weights(dim);
     double Z = 0.0;
+    std::vector<double> weights(dim);
+
+    for (int i = 0; i < dim; ++i)
+    {
+        double m = S - i;
+        double E = omega_0 * m;
+        double w = std::exp(-beta * E);
+        weights[i] = w;
+        Z += w;
+    }
+
     double P = 0.0;
     for (int i = 0; i < dim; ++i)
     {
         double m = S - i;
-        double energy = omega_0 * m;
-        double weight = std::exp(-beta * energy);
-        boltzmann_weights[i] = weight;
-        Z += weight;
-    }
-
-    for (int i = 0; i < dim; ++i)
-    {
-        double m = S - i;
-        double prob = boltzmann_weights[i] / Z;
+        double prob = weights[i] / Z;
         X0(i, i) = prob;
         P += m * prob;
     }
 
-    if (!isMatrixFinite(X0))
-    {
-        std::cerr << "\nThermal state contains non-finite entries, shutting down!\n" << std::endl;
-        exit(1);
-    }
+    double pol = std::abs(P/S);
+    std::cout << "[Thermal State] Target polarisation = "   << pol_target << std::endl;
+    std::cout << "[Thermal State] Achieved polarisation = " << pol << std::endl;
+    std::cout << "\n";
 
-    double pol = std::abs(P/N/2);
-    std::cout << "Initial polarisation is " << pol << std::endl;
     return X0;
 }
 
@@ -215,9 +283,9 @@ cMat initState(Params* pars, bool save = false)
 
         case StateType::Thermal:
         {
-            double beta = pars->beta;
+            double pol  = pars->pol;
             double om0  = pars->omega;
-            state = ThermalState(N, beta, om0);
+            state = ThermalState(N, pol, om0);
             if (save) { writeState(state, "ThermalState.txt"); }
             break;
         }

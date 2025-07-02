@@ -53,7 +53,7 @@ typedef struct
 
     double hthr;
     double omega;
-    double beta;
+    double pol;
     double theta;
     double phi;
     double gamma; // Control param gamma_p/gamma_m
@@ -82,7 +82,7 @@ Params defaults()
 
     pars.hthr  = 0.1f;
     pars.omega = 1.0f;
-    pars.beta  = 1.0f;
+    pars.pol   = 0.1f;
     pars.theta = 3.14/2.0;
     pars.phi   = 0.0f;
     pars.gamma = 0.8;
@@ -152,7 +152,7 @@ void printHelp()
     std::cout << "Timestep threshold         --thr            <dbl>    (Default: 0.5)"                         << std::endl; 
     std::cout << "                                                                   "                         << std::endl; 
     std::cout << "Omega (energy unit)        --omega          <dbl>    (Default: 1.0)"                         << std::endl; 
-    std::cout << "Inverse Temp (omega^-1)    --beta           <dbl>    (Default: 1.0)"                         << std::endl; 
+    std::cout << "Initial polarisation       --pol            <dbl>    (Default: 0.1)"                         << std::endl; 
     std::cout << "Control parameter (gp/gm)  --gamma          <dbl>    (Default: 0.9)"                         << std::endl; 
     std::cout << "                                                 "                                           << std::endl; 
     std::cout << "Output folder              --out            <str>"                                           << std::endl; 
@@ -172,7 +172,7 @@ int parseArgs(int argc, char* argv[], Params* pars)
         else if (!strcmp(argv[i], "--ti") && i+1 < argc)      { pars->t_i     = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--tf") && i+1 < argc)      { pars->t_f     = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--omega") && i+1 < argc)   { pars->omega   = atof(argv[++i]); }
-        else if (!strcmp(argv[i], "--beta") && i+1 < argc)    { pars->beta    = atof(argv[++i]); }
+        else if (!strcmp(argv[i], "--pol") && i+1 < argc)     { pars->pol     = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--theta") && i+1 < argc)   { pars->theta   = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--phi") && i+1 < argc)     { pars->phi     = atof(argv[++i]); }
         else if (!strcmp(argv[i], "--gamma") && i+1 < argc)   { pars->gamma   = atof(argv[++i]); }
@@ -230,13 +230,14 @@ std::string setDir(Params* pars, std::string state, std::string inte)
     int N = pars->N;
     double thr = pars->hthr;
     double gamma = pars->gamma;
-    double beta = pars->beta;
+    double pol = pars->pol;
 
     if (state == "Thermal")
     {
         dir1 << base << "/N" << N;
         dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
-             << thr << "_g" << std::fixed << std::setprecision(2) << gamma << "_beta" << beta << ".txt";
+             << thr << "_g" << std::fixed << std::setprecision(2) << gamma 
+             << "_pol" << std::setprecision(5) << pol << ".txt";
     } 
     else
     {
@@ -306,7 +307,7 @@ void printParams(Params* pars)
     std::cout << "ti             = " << pars->t_i        << std::endl; 
     std::cout << "tf             = " << pars->t_f        << std::endl; 
     std::cout << "omega          = " << pars->omega      << std::endl; 
-    std::cout << "beta           = " << pars->beta       << std::endl; 
+    std::cout << "pol            = " << pars->pol        << std::endl; 
     std::cout << "theta          = " << pars->theta      << std::endl; 
     std::cout << "phi            = " << pars->phi        << std::endl; 
     std::cout << "gamma+/gamma_- = " << pars->gamma      << std::endl; 

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 
-def run(N, state='Dicke', inte='RK4', hthr=0.3, gamma=0.8, ti=1e-3, tf=10.0, meas=50):
+def run(N, state='Dicke', inte='RK4', pol=0.1, hthr=0.3, gamma=0.8, ti=1e-3, tf=10.0, meas=50):
     '''
     '''
     main_dir = os.getcwd()
@@ -15,7 +15,7 @@ def run(N, state='Dicke', inte='RK4', hthr=0.3, gamma=0.8, ti=1e-3, tf=10.0, mea
     options = ["--N", str(N), "--thr", str(hthr), "--sthr", "0.00001",
                "--ti", str(ti), "--tf", str(tf), "--meas", str(meas),
                "--gamma", str(gamma), "--state", state, "--mtime", '1',
-               "--integrator", inte]
+               "--integrator", inte, "--pol", str(pol)]
     command = [exe] + options
     subprocess.run(command)
 
@@ -38,10 +38,23 @@ def driverSxN():
     for n in [10, 20, 30, 40, 50, 60, 70]:
         run(n, state='Ground', tf=100.0, gamma=0.8, hthr=0.1)
 
+def driverPol():
+
+    li0 = np.array([1e-3, 1e2])
+    li1 = np.linspace(0.1, 0.9, 9)
+    li2 = np.linspace(0.91, 0.99, 9)
+
+    pols = np.concatenate([li0, li1, li2])
+    #pols = [1e-5, 1e-4, 1e-3, 1e-2, 0.1, 0.5, 0.9]
+    for n in [100,]:
+        for p in pols:
+            run(n, state='Thermal', pol=p, tf=100.0, gamma=0.95, hthr=0.5)
+
 
 
 if __name__ == "__main__":
     #driverN()
     #driverStep()
-    driverGamma()
+    #driverGamma()
     #driverSxN()
+    driverPol()
