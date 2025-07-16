@@ -236,7 +236,7 @@ std::string setDir(Params* pars, std::string state, std::string inte)
     {
         dir1 << base << "/N" << N;
         dir2 << dir1.str() << "/" << state << "_" << inte << "_h" 
-             << thr << "_g" << std::fixed << std::setprecision(2) << gamma 
+             << thr << "_g" << std::fixed << std::setprecision(3) << gamma
              << "_pol" << std::setprecision(5) << pol << ".txt";
     } 
     else

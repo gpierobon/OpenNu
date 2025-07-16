@@ -40,15 +40,18 @@ def driverSxN():
 
 def driverPol():
 
-    li0 = np.array([1e-3, 1e2])
+    li0 = np.array([1e5, 1e-4, 1e-3, 1e-2, 1e-1])
     li1 = np.linspace(0.1, 0.9, 9)
     li2 = np.linspace(0.91, 0.99, 9)
 
     pols = np.concatenate([li0, li1, li2])
-    #pols = [1e-5, 1e-4, 1e-3, 1e-2, 0.1, 0.5, 0.9]
+    #pols = [1e-5, 1e-4, 1e-3, 1e-2, 0.1, 0.9]
+    #pols = [0.5]
+
     for n in [100,]:
+#        for g in np.arange(0.95, 0.999, 0.001):
         for p in pols:
-            run(n, state='Thermal', pol=p, tf=100.0, gamma=0.95, hthr=0.5)
+            run(n, state='Thermal', inte='Euler', pol=p, tf=100.0, gamma=0.99, hthr=0.5)
 
 
 
